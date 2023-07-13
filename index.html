@@ -1,0 +1,56 @@
+<style>
+    @font-face {
+            font-family: "SplineSansMono";
+            src: url('fonts/SplineSansMono.ttf') format('truetype');
+        }
+
+    body, select, input[type="text"], input[type="password"], input[type="submit"], input[type="button"] {
+        font-family: SplineSansMono;
+        font-size: 14px;
+    }
+    body {
+        background-color: #111;
+        color: #fff;
+    }
+    form {
+        height: 100px;
+        margin: 0 auto;
+        width: 300px;
+        padding: 1em;
+    }
+    select, input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 30px;
+        border: none;
+    }
+    input[type="submit"], input[type="button"] {
+        padding: 10px 20px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 30px;
+    }
+    input[type="submit"] {
+        background-color: #c31919;
+    }
+    input[type="button"] {
+        background-color: rgb(57, 57, 57);
+        margin-top: 5px;
+    }
+</style>
+<form method="POST">
+    <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
+    <br>
+    NETWORK:  <select name="ssid">{ssid_options}</select><br><br>
+    PASSWORD: <input type="password" name="password"><br><br>
+    <input type="submit" value="CONNECT"><br><br>
+    <input type="button" value="Scan network again" onclick="location.reload()">
+    <br><br>
+    <p style="color: rgb(120, 120, 120);">Paragraphica needs a internet conenction to gather location data for the image generation process. Passwords are securely stored on the device. </p>
+    <a style="color: rgb(120, 120, 120);" href="">Documentation</a>
+    <br><br>
+    <a style="color: rgb(120, 120, 120);" href="">Privacy Policy</a>
+    <br><br>
+</form>
