@@ -8,7 +8,8 @@ ssh@raspberrypi.local
 
 if that does not work run the nmap -sn 192.168.1.0/24 command and ssh intothe ip adress directly
 
-## **Notes on setting up virtual access point**
+---
+## **📡 Notes on setting up virtual access point**
 
 Install the necessary software:
 
@@ -105,5 +106,98 @@ Now reboot your Pi:
 ```
 sudo reboot
 ```
+---
+## **💾 Bring in project files**
 
-## **Bring in git files and set up boot script**
+Install git: 
+```
+sudo apt update
+sudo apt install git
+```
+
+Clone the Paragraphica-v2 repository
+
+```
+git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
+```
+
+to update the git repository run: 
+```
+cd Paragraphica-v2
+git pull
+```
+---
+## **🚪 Setup captive portal**
+
+For this we will install NoDogSplash. First install nessesarry packages: 
+
+```
+sudo apt install git build-essential libssl-dev apache2-utils libmicrohttpd-dev
+```
+
+Clone the NoDogSplash repository: 
+```
+git clone https://github.com/nodogsplash/nodogsplash.git
+```
+Enter the nodogsplash directory:
+```
+cd nodogsplash
+```
+install
+```
+make
+sudo make install
+```
+create the /etc/nodogsplash directory:
+```
+sudo mkdir /etc/nodogsplash
+```
+then copy the default nodogsplash.conf into that directory:
+```
+sudo cp /home/pi/nodogsplash/resources/nodogsplash.conf /etc/nodogsplash/
+```
+open the nodogsplash.conf in nano
+```
+sudo nano /etc/nodogsplash/nodogsplash.conf
+```
+Edit the conf file with these parameters:
+```
+GatewayInterface ap0
+GatewayAddress 10.0.0.1  
+GatewayPort 2050
+```
+Restart **nodogsplash** to apply the changes:
+
+```
+sudo cp ~/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
+sudo systemctl enable nodogsplash.service 
+
+sudo systemctl start nodogsplash.service 
+```
+---
+## **🚨 Prepare project requirementst**
+
+Get pip3
+```
+sudo apt-get install python3-pip
+```
+install flask through pip3
+```
+pip3 install flask
+```
+---
+## **🥾 Set up boot script**
+
+Open the /etc/rc.local file in a text editor. You can use nano:
+```
+sudo nano /etc/rc.local
+```
+Add the following line before exit 0 in the file:
+```
+python3 /home/pi/Paragraphica-v2/wifi-connect.py &
+```
+
+Make your script executable by running:
+```
+sudo chmod +x /home/pi/Paragraphica-v2/wifi-connect.py
+```

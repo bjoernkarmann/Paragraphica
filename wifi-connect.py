@@ -60,4 +60,4 @@ def launch_program():
     os._exit(0)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='10.0.0.1', port=80)
