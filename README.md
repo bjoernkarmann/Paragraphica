@@ -9,11 +9,8 @@ This mannual guide will set up a Raspberry Pi for the Paragraphica camera shield
 
 - A Raspberry Pi with WiFi capabilities
 - Python 3 installed
-- Flask installed (`pip install flask`)
+
 ## 1. Setup Raspberry Pi Zero
-
-
-Create an empty **ssh** file onto the boot directory of the microSD card. 
 
 log into SSH using the terminal: 
 
@@ -23,8 +20,12 @@ ssh pi@raspberrypi.local
 username: pi
 password: paragraphica
 
-sudo apt update
-install nettalk for easy file sharing 
+```
+sudo apt-get update
+sudo apt-get install hostapd dnsmasq git python3-pip libmicrohttpd-dev build-essential
+```
+
+
 
 ## 2. Setup Wifi connect
 
@@ -33,13 +34,30 @@ First we got to set up the wifi-connect.py on boot. We want a WiFi hotspot that 
 ### **2.1 Install necessary packages**
 
 ```
-sudo apt-get update
-sudo apt-get install hostapd dnsmasq nodogsplash
+sudo pip3 install flask
+```
+
+```
+git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
 ```
 
 ### **2.2 Configure nodogsplash**
 This will enable a captive portal to appear when the user logs into the network
 
+pull nodogsplash from github
+```
+cd ~
+git clone https://github.com/nodogsplash/nodogsplash.git
+```
+
+go to the nodogsplash folder and isntall it
+```
+cd ~/nodogsplash
+make
+sudo make install
+```
+
+open the nodogsplash.conf in nano
 ```
 sudo nano /etc/nodogsplash/nodogsplash.conf
 ```
@@ -48,8 +66,12 @@ In edit mode change the RedirectURL to the IP of the raspberry pi: `RedirectURL 
 
 Restart **nodogsplash** to apply the changes:
 
+
 ```
-sudo systemctl restart nodogsplash
+sudo cp ~/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
+sudo systemctl enable nodogsplash.service 
+
+sudo systemctl start nodogsplash.service 
 ```
 
 ### **2.3 Configure hostapd**
@@ -65,7 +87,7 @@ Add the following configuration to the hostbad file:
 ```
 interface=wlan0
 driver=nl80211
-ssid=Paragraphica Connect
+ssid=paragraphica-connect
 hw_mode=g
 channel=7
 wmm_enabled=0
