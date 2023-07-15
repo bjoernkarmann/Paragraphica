@@ -56,11 +56,11 @@
         <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
         <br>
         <p id="error_msg" style="color: #c31919;"></p>
-        <p>{{ test_variable }}</p>
+        <p>{{ ssid_options }}</p>
         NETWORK:  
         <select id="network" name="ssid">
             <option value="">Select a network</option>
-            {% for option in ssids %}
+            {% for option in ssid_options %}
             <option value="{{ option }}">{{ option }}</option>
             {% endfor %}
         </select><br><br>

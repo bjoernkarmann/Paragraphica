@@ -25,18 +25,15 @@ def connect_wifi():
     
     # when user click on connect with ssid and password
     if request.method == 'POST':
-        print(f"Host tried to connect")
         selected_ssid = request.form['ssid']
         wifi_password = request.form['password']
         
         if not selected_ssid:
-            print(f"Pv2 select a network")
             error = 'Please select a network'
         elif not wifi_password:
-            print(f"Pv2 password required")
             error = 'WiFi password is required'
         else:
-            print(f"Pv2 Connecting to: {selected_ssid}")
+            print(f"Connecting to: {selected_ssid}")
             connect_to_wifi(selected_ssid, wifi_password)
             if check_wifi():
                 launch_program()
@@ -45,8 +42,10 @@ def connect_wifi():
             else:
                 error = 'Failed to connect'
 
-    print(f"Pv2 Scanned networks: {ssids}")
-    return render_template('wifi-portal.html', ssid_options=ssids, test_variable="hello world", error=error)   
+    # clean up data before sending it to the flask app
+    ssid_options = [ssid for ssid in ssids if ssid and not ssid.startswith('\\x')]
+    # start flask app
+    return render_template('wifi-portal.html', ssid_options=ssid_options, error=error)   
 
 def connect_to_wifi(ssid, password):
     print(f"Pv2 Connecting to: " + ssid)
