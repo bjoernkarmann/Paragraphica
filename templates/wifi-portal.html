@@ -56,11 +56,15 @@
         <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
         <br>
         <p id="error_msg" style="color: #c31919;"></p>
-        NETWORK:  <select id="network" name="ssid">
-                    <option value="">Select a network</option>
-                    {ssid_options}
-                </select><br><br>
-        PASSWORD: <input id="password" type="password" name="password"><br><br>
+        NETWORK:  
+        <select id="network" name="ssid">
+            <option value="">Select a network</option>
+            {% for option in ssid_options %}
+            <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+        </select><br><br>
+        PASSWORD: 
+        <input id="password" type="password" name="password"><br><br>
         <input type="submit" value="CONNECT"><br><br>
         <input type="button" value="Scan network again" onclick="location.reload()">
         <br><br>
@@ -76,10 +80,9 @@
         let errorMsg = document.getElementById("error_msg");
 
         if (network === "" || password === "") {
-            alert("Please select a network and enter a password");
+            errorMsg.textContent = "Please select a network and enter a password";
             return false;
         }
-        errorMsg.textContent = "Please select a network and enter a password";
         errorMsg.textContent = "";
         return true;
     }
