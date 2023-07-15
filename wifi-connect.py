@@ -21,6 +21,7 @@ def check_wifi():
 @app.route('/', methods=['GET', 'POST'])
 def connect_wifi():
     error = None
+    success = None
     ssids = get_ssids()
     
     # when user click on connect with ssid and password
@@ -34,18 +35,18 @@ def connect_wifi():
             error = 'WiFi password is required'
         else:
             print(f"Connecting to: {selected_ssid}")
-            connect_to_wifi(selected_ssid, wifi_password)
-            if check_wifi():
+            if connect_to_wifi(selected_ssid, wifi_password) and check_wifi():
                 launch_program()
-                print(f"Success! Program launched")
-                return 'Success! Program launched'
+                error = ' '
+                success = 'Success!'
             else:
                 error = 'Failed to connect'
+                success = ' '
 
     # clean up data before sending it to the flask app
     ssid_options = [ssid for ssid in ssids if ssid and not ssid.startswith('\\x')]
     # start flask app
-    return render_template('wifi-portal.html', ssid_options=ssid_options, error=error)   
+    return render_template('wifi-portal.html', ssid_options=ssid_options, error=error, success=success)   
 
 def connect_to_wifi(ssid, password):
     print(f"Pv2 Connecting to: " + ssid)
@@ -64,7 +65,13 @@ network={{
 
     subprocess.run(['sudo', 'systemctl', 'restart', 'wpa_supplicant'])  
     time.sleep(10) # Wait for connection
-    
+
+    # check if wifi is connected
+    result = subprocess.run(['ping', '-c', '4', '8.8.8.8'], stdout=subprocess.PIPE) 
+    if result.returncode == 0:
+        return True  # ping was successful, we have a connection
+    else:
+        return False  # ping failed, no connection
 def launch_program():
     subprocess.run(['python3', './main.py']) 
     os._exit(0)

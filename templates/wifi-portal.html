@@ -55,8 +55,8 @@
     <form id="wifiForm" method="POST">
         <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
         <br>
-        <p id="error_msg" style="color: #c31919;"></p>
-        <p>{{ ssid_options }}</p>
+        <p style="color: #c31919;">{ error }</p>
+        <p style="color: #19c38d;">{ success }</p>
         NETWORK:  
         <select id="network" name="ssid">
             <option value="">Select a network</option>
@@ -78,13 +78,9 @@
     document.getElementById("wifiForm").onsubmit = function() {
         let network = document.getElementById("network").value;
         let password = document.getElementById("password").value;
-        let errorMsg = document.getElementById("error_msg");
-
         if (network === "" || password === "") {
-            errorMsg.textContent = "Please select a network and enter a password";
             return false;
         }
-        errorMsg.textContent = "";
         return true;
     }
     </script>
