@@ -175,6 +175,7 @@ Edit the configure file with these parameters:
 ```
 GatewayInterface ap0
 GatewayAddress 192.168.50.1  
+RedirectURL http://192.168.50.1:8080/
 GatewayPort 2050
 ```
 *note that some of the parameters may exisit and just need to be changed. 
@@ -190,6 +191,10 @@ then:
 ```
 sudo iptables -t nat -A PREROUTING -i ap0 -p tcp --dport 80 -j REDIRECT --to-port 2050
 ```
+
+```
+sudo nano /etc/nodogsplash/nodogsplash.conf
+````
 
 Restart **nodogsplash** to apply the changes:
 

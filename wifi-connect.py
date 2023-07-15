@@ -36,7 +36,7 @@ def connect_wifi():
             else:
                 error = 'Failed to connect'
 
-    return render_template('index.html', ssids=ssids, error=error)   
+    return render_template('wifi-portal.html', ssids=ssids, error=error)   
 
 def connect_to_wifi(ssid, password):
     with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
