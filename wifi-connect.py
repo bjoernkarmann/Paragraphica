@@ -49,12 +49,9 @@ def connect_wifi():
     return render_template('wifi-portal.html', ssid_options=ssid_options, error=error, success=success)   
 
 def connect_to_wifi(ssid, password):
-    print(f"Pv2 Connecting to: " + ssid)
-    with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
+    print(f"Connecting to: " + ssid)
+    with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'a') as f:
         f.write(f'''
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev    
-update_config=1
-country=US
 
 network={{
     ssid="{ssid}"
@@ -64,8 +61,9 @@ network={{
         ''')
 
     subprocess.run(['sudo', 'systemctl', 'restart', 'wpa_supplicant'])  
+    print(f"Waiting to confirm connection...")
     time.sleep(10) # Wait for connection
-
+    
     # check if wifi is connected
     result = subprocess.run(['ping', '-c', '4', '8.8.8.8'], stdout=subprocess.PIPE) 
     if result.returncode == 0:
