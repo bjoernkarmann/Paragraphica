@@ -10,10 +10,10 @@ def get_ssids():
     try:
         result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
         ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
-        print(f"Scanned networks: {ssids}")
+        print(f"Pv2Scanned networks: {ssids}")
         return ssids
     except Exception as e:
-        print(f"Error scanning networks: {e}")
+        print(f"Pv2 Error scanning networks: {e}")
 
 def check_wifi():
     result = subprocess.run(['iwgetid', '-r'], stdout=subprocess.PIPE)
@@ -44,6 +44,7 @@ def connect_wifi():
     return render_template('wifi-portal.html', ssids=ssids, error=error)   
 
 def connect_to_wifi(ssid, password):
+    print(f"Pv2 Connecting to: " + ssid)
     with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
         f.write(f'''
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev    
