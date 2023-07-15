@@ -1,15 +1,15 @@
+## **📡 Initial setup **
 
-set up SD card with **Raspberry Pi Imager**
-ssh into the device via
+set up SD card with **Raspberry Pi Imager** and make sure it is able to connect to the internet fot the initial setup. Then ssh into the device:
 
 ```
-ssh@raspberrypi.local
+ssh pi@raspberrypi.local
 ```
 
-if that does not work run the nmap -sn 192.168.1.0/24 command and ssh intothe ip adress directly
+if that does not work run the nmap -sn 192.168.1.0/24 command and ssh intothe ip adress directly: 
 
 ---
-## **📡 Notes on setting up virtual access point**
+## **📡 Setup WiFi Access Point**
 
 Install the necessary software:
 
@@ -107,7 +107,7 @@ Now reboot your Pi:
 sudo reboot
 ```
 ---
-## **💾 Bring in project files**
+## **💾 Clone and Update Git Repository**
 
 Install git: 
 ```
@@ -127,7 +127,7 @@ cd Paragraphica-v2
 git pull
 ```
 ---
-## **🚪 Setup captive portal**
+## **🚪 Install and Configure NoDogSplash**
 
 For this we will install NoDogSplash. First install nessesarry packages: 
 
@@ -163,8 +163,17 @@ sudo nano /etc/nodogsplash/nodogsplash.conf
 Edit the conf file with these parameters:
 ```
 GatewayInterface ap0
-GatewayAddress 10.0.0.1  
+GatewayAddress 192.168.50.1  
 GatewayPort 2050
+```
+set firefall settings:
+```
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+```
+then:
+```
+sudo iptables -t nat -A PREROUTING -i ap0 -p tcp --dport 80 -j REDIRECT --to-port 2050
 ```
 Restart **nodogsplash** to apply the changes:
 
@@ -175,7 +184,7 @@ sudo systemctl enable nodogsplash.service
 sudo systemctl start nodogsplash.service 
 ```
 ---
-## **🚨 Prepare project requirementst**
+## **🚨 Prepare Project Requirements**
 
 Get pip3
 ```
@@ -186,7 +195,7 @@ install flask through pip3
 pip3 install flask
 ```
 ---
-## **🥾 Set up boot script**
+## **🥾 Setup Boot Script**
 
 Open the /etc/rc.local file in a text editor. You can use nano:
 ```
