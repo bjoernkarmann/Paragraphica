@@ -138,78 +138,6 @@ iwconfig
 ```
 
 ---
-## **🚪 Install and Configure NoDogSplash**
-
-Make sure you ssh back into your raspberrypi. Then install nessesarry packages: 
-
-```
-sudo apt install git build-essential libssl-dev apache2-utils libmicrohttpd-dev
-```
-
-Clone the NoDogSplash repository: 
-```
-git clone https://github.com/nodogsplash/nodogsplash.git
-```
-Enter the nodogsplash directory:
-```
-cd nodogsplash
-```
-install
-```
-make
-sudo make install
-```
-create the /etc/nodogsplash directory:
-```
-sudo mkdir /etc/nodogsplash
-```
-then copy the default nodogsplash.conf into that directory:
-```
-sudo cp /home/pi/nodogsplash/resources/nodogsplash.conf /etc/nodogsplash/
-```
-open the nodogsplash.conf in nano
-```
-sudo nano /etc/nodogsplash/nodogsplash.conf
-```
-Edit the configure file with these parameters:
-```
-GatewayInterface ap0
-GatewayAddress 192.168.50.1  
-RedirectURL http://192.168.50.1:8080/
-GatewayPort 2050
-```
-*note that some of the parameters may exisit and just need to be changed. 
-
-Save and exit. 
-
-set firefall settings:
-```
-sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-```
-then:
-```
-sudo iptables -t nat -A PREROUTING -i ap0 -p tcp --dport 80 -j REDIRECT --to-port 2050
-```
-
-```
-sudo nano /etc/nodogsplash/nodogsplash.conf
-````
-
-Restart **nodogsplash** to apply the changes:
-
-```
-sudo cp ~/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
-sudo systemctl enable nodogsplash.service 
-
-sudo systemctl start nodogsplash.service 
-```
-you should be able to see "active" to insure a successful install: 
-```
-sudo systemctl status nodogsplash
-```
-
----
 ## **💾 Clone and Update Git Repository**
 
 If not already installed then make sure you have git installed: 
@@ -228,7 +156,8 @@ git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
 to update the git repository run: 
 ```
 cd Paragraphica-v2
-git pull
+git fetch origin
+git reset --hard origin/main
 ```
 
 ## **🚨 Prepare Project Requirements**
@@ -264,3 +193,4 @@ Make your script executable by running:
 ```
 sudo chmod +x /home/pi/Paragraphica-v2/wifi-connect.py
 ```
+

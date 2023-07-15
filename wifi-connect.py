@@ -7,9 +7,13 @@ import re
 app = Flask(__name__)
 
 def get_ssids():
-    result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
-    ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
-    return ssids
+    try:
+        result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
+        ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
+        print(f"Scanned networks: {ssids}")
+        return ssids
+    except Exception as e:
+        print(f"Error scanning networks: {e}")
 
 def check_wifi():
     result = subprocess.run(['iwgetid', '-r'], stdout=subprocess.PIPE)
@@ -20,6 +24,7 @@ def connect_wifi():
     error = None
     ssids = get_ssids()
     
+    # when user click on connect with ssid and password
     if request.method == 'POST':
         selected_ssid = request.form['ssid']
         wifi_password = request.form['password']
