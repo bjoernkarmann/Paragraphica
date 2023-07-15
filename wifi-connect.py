@@ -36,6 +36,7 @@ def connect_wifi():
             print(f"Pv2 password required")
             error = 'WiFi password is required'
         else:
+            print(f"Pv2 Connecting to: {selected_ssid}")
             connect_to_wifi(selected_ssid, wifi_password)
             if check_wifi():
                 launch_program()
@@ -44,8 +45,8 @@ def connect_wifi():
             else:
                 error = 'Failed to connect'
 
-    print(f"Pv2 Scanned networks: {len(ssids)}")
-    return render_template('wifi-portal.html', ssids=ssids, error=error)   
+    print(f"Pv2 Scanned networks: {ssids}")
+    return render_template('wifi-portal.html', ssid_options=ssids, test_variable="hello world", error=error)   
 
 def connect_to_wifi(ssid, password):
     print(f"Pv2 Connecting to: " + ssid)
