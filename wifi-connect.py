@@ -10,7 +10,7 @@ def get_ssids():
     try:
         result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
         ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
-        print(f"Pv2Scanned networks: {ssids}")
+        print(f"Pv2 Scanned networks")
         return ssids
     except Exception as e:
         print(f"Pv2 Error scanning networks: {e}")
@@ -30,13 +30,16 @@ def connect_wifi():
         wifi_password = request.form['password']
         
         if not selected_ssid:
+            print(f"Pv2 select a network")
             error = 'Please select a network'
         elif not wifi_password:
+            print(f"Pv2 password required")
             error = 'WiFi password is required'
         else:
             connect_to_wifi(selected_ssid, wifi_password)
             if check_wifi():
                 launch_program()
+                print(f"Success! Program launched")
                 return 'Success! Program launched'
             else:
                 error = 'Failed to connect'
