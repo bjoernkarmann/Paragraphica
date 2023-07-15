@@ -132,6 +132,11 @@ sudo reboot
 ```
 You should be able to see "Paragraphica Connect" on your network list.
 
+You can also check if wlan0 and ap0 are both on the list when running:
+```
+iwconfig
+```
+
 ---
 ## **🚪 Install and Configure NoDogSplash**
 
@@ -202,15 +207,16 @@ sudo systemctl status nodogsplash
 ---
 ## **💾 Clone and Update Git Repository**
 
-Install git: 
+If not already installed then make sure you have git installed: 
 ```
 sudo apt update
 sudo apt install git
 ```
 
-Clone the Paragraphica-v2 repository
+Clone the Paragraphica-v2 repository to the root
 
 ```
+cd
 git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
 ```
 
@@ -230,8 +236,15 @@ install flask through pip3
 ```
 pip3 install flask
 ```
+
+Now we can try run the wifi-connect.py to check if the captive portal appears when connecting to the network "Paragraphica Connect":
+```
+python3 wifi-connect.py
+```
 ---
 ## **🥾 Setup Boot Script**
+
+Untested!
 
 Open the /etc/rc.local file in a text editor. You can use nano:
 ```
