@@ -1,71 +1,192 @@
-# Easy set up
+## **📡 Initial RPI setup**
 
-
-# Mannual set up 
-
-This mannual guide will set up a Raspberry Pi for the Paragraphica camera shield v2.1.
-
-## Prerequisites
-
-- A Raspberry Pi with WiFi capabilities
-- Python 3 installed
-
-## 1. Setup Raspberry Pi Zero
-
-log into SSH using the terminal: 
+set up SD card with **Raspberry Pi Imager** and make sure it is able to connect to the internet fot the initial setup. Then ssh into the device:
 
 ```
 ssh pi@raspberrypi.local
 ```
-username: pi
-password: paragraphica
+
+password is: paragraphica
+
+if that does not work run the nmap on your routers ip: 
+```
+nmap -sn 192.168.1.1/24
+```
+Find the ip adress for your pi, then ssh using the ip adress directly:
 
 ```
-sudo apt-get update
-sudo apt-get install hostapd dnsmasq git python3-pip libmicrohttpd-dev build-essential
+ssh pi@192.168.1.175
 ```
 
-
-
-## 2. Setup Wifi connect
-
-First we got to set up the wifi-connect.py on boot. We want a WiFi hotspot that provides a web interface for users to connect it to a WiFi network. 
-
-### **2.1 Install necessary packages**
-
+if you have *key varification failed* error, simply reset it and try again: 
 ```
-sudo pip3 install flask
+ssh-keygen -R 192.168.1.175
 ```
 
+---
+## **📡 Setup WiFi Access Point**
+
+Install the necessary software:
+
 ```
-git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
+sudo apt update
+sudo apt install dnsmasq hostapd
 ```
 
-### **2.2 Configure nodogsplash**
-This will enable a captive portal to appear when the user logs into the network
-
-pull nodogsplash from github
+Then stop these services as we will configure them:
 ```
-cd ~
+sudo systemctl stop dnsmasq
+sudo systemctl stop hostapd
+```
+
+Create the virtual wireless interface by opening /etc/dhcpcd.conf:
+```
+sudo nano /etc/dhcpcd.conf
+```
+and then add the following lines to the end of the file: 
+```
+interface ap0
+    static ip_address=192.168.50.1/24
+    nohook wpa_supplicant
+```
+Save and exit.
+
+The next step is to configure the DHCP server (dnsmasq). Move the default configuration file and create a new one:
+```
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig  
+sudo nano /etc/dnsmasq.conf
+```
+Then add the following to the new dnsmasq.conf:
+```
+interface=ap0
+dhcp-range=192.168.50.50,192.168.50.150,255.255.255.0,12h
+```
+Save and exit.
+
+Now, set up the access point. Create the hostapd configuration file:
+```
+sudo nano /etc/hostapd/hostapd.conf
+```
+Add the following lines to this file:
+
+```
+interface=ap0
+driver=nl80211
+ssid=Paragraphica Connect
+hw_mode=g
+channel=7
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=starmole
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+```
+
+Modify /etc/default/hostapd to point to this configuration file:
+```
+sudo nano /etc/default/hostapd
+```
+
+Find the line #DAEMON_CONF="" and replace it with:
+```
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+```
+Save and exit. 
+
+Enable and start hostapd and dnsmasq:
+```
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl start hostapd
+sudo systemctl start dnsmasq
+```
+
+enable IP forwarding. Open /etc/sysctl.conf:
+
+```
+sudo nano /etc/sysctl.conf
+```
+
+And uncomment this line: **net.ipv4.ip_forward=1**
+
+Save and exit. 
+
+The Raspberry Pi should now be set up to run a WiFi network on startup. However, we still need to create the ap0 interface on boot. For that, we need to add a line to /etc/rc.local:
+
+```
+sudo nano /etc/rc.local
+```
+
+Add this line before exit 0:
+```
+iw dev wlan0 interface add ap0 type __ap
+```
+
+Save and exit and reboot your Pi:
+```
+sudo reboot
+```
+You should be able to see "Paragraphica Connect" on your network list.
+
+---
+## **🚪 Install and Configure NoDogSplash**
+
+Make sure you ssh back into your raspberrypi. Then install nessesarry packages: 
+
+```
+sudo apt install git build-essential libssl-dev apache2-utils libmicrohttpd-dev
+```
+
+Clone the NoDogSplash repository: 
+```
 git clone https://github.com/nodogsplash/nodogsplash.git
 ```
-
-go to the nodogsplash folder and isntall it
+Enter the nodogsplash directory:
 ```
-cd ~/nodogsplash
+cd nodogsplash
+```
+install
+```
 make
 sudo make install
 ```
-
+create the /etc/nodogsplash directory:
+```
+sudo mkdir /etc/nodogsplash
+```
+then copy the default nodogsplash.conf into that directory:
+```
+sudo cp /home/pi/nodogsplash/resources/nodogsplash.conf /etc/nodogsplash/
+```
 open the nodogsplash.conf in nano
 ```
 sudo nano /etc/nodogsplash/nodogsplash.conf
 ```
+Edit the configure file with these parameters:
+```
+GatewayInterface ap0
+GatewayAddress 192.168.50.1  
+GatewayPort 2050
+```
+*note that some of the parameters may exisit and just need to be changed. 
 
-In edit mode change the RedirectURL to the IP of the raspberry pi: `RedirectURL http://192.168.0.1`. Save the configuration file and exit the text editor. If you're using nano, you can do this by pressing **Ctrl+X**, then **Y**, then **Enter**.
+Save and exit. 
+
+set firefall settings:
+```
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+```
+then:
+```
+sudo iptables -t nat -A PREROUTING -i ap0 -p tcp --dport 80 -j REDIRECT --to-port 2050
+```
 
 Restart **nodogsplash** to apply the changes:
-
 
 ```
 sudo cp ~/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
@@ -73,66 +194,55 @@ sudo systemctl enable nodogsplash.service
 
 sudo systemctl start nodogsplash.service 
 ```
-
-### **2.3 Configure hostapd**
-
-Edit the /etc/hostapd/hostapd.conf file to set up the WiFi hotspot:
-
+you should be able to see "active" to insure a successful install: 
 ```
-sudo nano /etc/hostapd/hostapd.conf
+sudo systemctl status nodogsplash
 ```
 
-Add the following configuration to the hostbad file:
+---
+## **💾 Clone and Update Git Repository**
 
+Install git: 
 ```
-interface=wlan0
-driver=nl80211
-ssid=paragraphica-connect
-hw_mode=g
-channel=7
-wmm_enabled=0
-macaddr_acl=0
-auth_algs=1
-ignore_broadcast_ssid=0
+sudo apt update
+sudo apt install git
 ```
 
-### **2.4 Setup the Python script to run at boot**
-
-Create a new systemd service file:
+Clone the Paragraphica-v2 repository
 
 ```
-sudo nano /etc/systemd/system/wifi-connect.service
+git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
 ```
 
-Add the following content to the service file, replacing `/path/to/your/wifi-connect.py` with the actual path to your Python script:
-
+to update the git repository run: 
 ```
-[Unit]
-Description=WiFi Connect
-After=network.target
-
-[Service]
-ExecStart=/usr/bin/python3 /path/to/your/wifi-connect.py
-WorkingDirectory=/path/to/your/
-StandardOutput=inherit
-StandardError=inherit
-Restart=always
-User=pi
-
-[Install]
-WantedBy=multi-user.target
+cd Paragraphica-v2
+git pull
 ```
 
-Enable the service to start at boot:
+## **🚨 Prepare Project Requirements**
 
+Install pip3
 ```
-sudo systemctl enable wifi-connect.service
+sudo apt-get install python3-pip
+```
+install flask through pip3
+```
+pip3 install flask
+```
+---
+## **🥾 Setup Boot Script**
+
+Open the /etc/rc.local file in a text editor. You can use nano:
+```
+sudo nano /etc/rc.local
+```
+Add the following line before exit 0 in the file:
+```
+python3 /home/pi/Paragraphica-v2/wifi-connect.py &
 ```
 
-Start the service:
+Make your script executable by running:
 ```
-sudo systemctl start wifi-connect.service
+sudo chmod +x /home/pi/Paragraphica-v2/wifi-connect.py
 ```
-
-
-After setting up, the Raspberry Pi will broadcast a WiFi hotspot named `Paragraphica Connect`. Connect to this hotspot and navigate to the Raspberry Pi's IP address in a web browser to access the web interface. From there, you can select a WiFi network and enter the password to connect the Raspberry Pi to that network.
