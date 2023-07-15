@@ -10,7 +10,6 @@ def get_ssids():
     try:
         result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
         ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
-        print(f"Pv2 Scanned networks: {len(ssids)}")
         return ssids
     except Exception as e:
         print(f"Pv2 Error scanning networks: {e}")
@@ -45,6 +44,7 @@ def connect_wifi():
             else:
                 error = 'Failed to connect'
 
+    print(f"Pv2 Scanned networks: {len(ssids)}")
     return render_template('wifi-portal.html', ssids=ssids, error=error)   
 
 def connect_to_wifi(ssid, password):
