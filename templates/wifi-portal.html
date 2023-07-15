@@ -1,56 +1,89 @@
-<style>
-    @font-face {
-            font-family: "SplineSansMono";
-            src: url('/static/fonts/SplineSansMono.ttf') format('truetype');
+<!DOCTYPE html>
+<html>
+<body>
+    <style>
+        @font-face {
+                font-family: "SplineSansMono";
+                src: url('/static/fonts/SplineSansMono.ttf') format('truetype');
+            }
+
+        body, select, input[type="text"], input[type="password"], input[type="submit"], input[type="button"] {
+            font-family: SplineSansMono;
+            font-size: 14px;
+        }
+        body {
+            background-color: #111;
+            color: #fff;
+        }
+        form {
+            height: 100px;
+            margin: 0 auto;
+            width: 300px;
+            padding: 1em;
+        }
+        select, input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 30px;
+            border: none;
+        }
+        input[type="submit"], input[type="button"] {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+        }
+        input[type="submit"] {
+            background-color: #c31919;
+        }
+        input[type="button"] {
+            background-color: rgb(57, 57, 57);
+            margin-top: 5px;
         }
 
-    body, select, input[type="text"], input[type="password"], input[type="submit"], input[type="button"] {
-        font-family: SplineSansMono;
-        font-size: 14px;
+        .gray {
+            color: rgb(120, 120, 120);    
+        }
+
+        a {
+            margin-bottom: 20px;
+        }
+
+    </style>
+    <form id="wifiForm" method="POST">
+        <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
+        <br>
+        <p id="error_msg" style="color: #c31919;"></p>
+        NETWORK:  <select id="network" name="ssid">
+                    <option value="">Select a network</option>
+                    {ssid_options}
+                </select><br><br>
+        PASSWORD: <input id="password" type="password" name="password"><br><br>
+        <input type="submit" value="CONNECT"><br><br>
+        <input type="button" value="Scan network again" onclick="location.reload()">
+        <br><br>
+        <p class="gray" >Paragraphica needs a internet conenction to gather location data for the image generation process. Passwords are securely stored on the device. </p>
+        <a class="gray" href="">Documentation</a>
+        <a class="gray" href="">Privacy Policy</a>
+    </form>
+
+    <script>
+    document.getElementById("wifiForm").onsubmit = function() {
+        let network = document.getElementById("network").value;
+        let password = document.getElementById("password").value;
+        let errorMsg = document.getElementById("error_msg");
+
+        if (network === "" || password === "") {
+            alert("Please select a network and enter a password");
+            return false;
+        }
+        errorMsg.textContent = "Please select a network and enter a password";
+        errorMsg.textContent = "";
+        return true;
     }
-    body {
-        background-color: #111;
-        color: #fff;
-    }
-    form {
-        height: 100px;
-        margin: 0 auto;
-        width: 300px;
-        padding: 1em;
-    }
-    select, input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 30px;
-        border: none;
-    }
-    input[type="submit"], input[type="button"] {
-        padding: 10px 20px;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 30px;
-    }
-    input[type="submit"] {
-        background-color: #c31919;
-    }
-    input[type="button"] {
-        background-color: rgb(57, 57, 57);
-        margin-top: 5px;
-    }
-</style>
-<form method="POST">
-    <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
-    <br>
-    NETWORK:  <select name="ssid">{ssid_options}</select><br><br>
-    PASSWORD: <input type="password" name="password"><br><br>
-    <input type="submit" value="CONNECT"><br><br>
-    <input type="button" value="Scan network again" onclick="location.reload()">
-    <br><br>
-    <p style="color: rgb(120, 120, 120);">Paragraphica needs a internet conenction to gather location data for the image generation process. Passwords are securely stored on the device. </p>
-    <a style="color: rgb(120, 120, 120);" href="">Documentation</a>
-    <br><br>
-    <a style="color: rgb(120, 120, 120);" href="">Privacy Policy</a>
-    <br><br>
-</form>
+    </script>
+
+</body>
+</html>

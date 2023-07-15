@@ -10,7 +10,7 @@ def get_ssids():
     try:
         result = subprocess.run(['sudo', 'iwlist', 'wlan0', 'scan'], stdout=subprocess.PIPE)
         ssids = re.findall(r'ESSID:"(.*?)"', result.stdout.decode())
-        print(f"Pv2 Scanned networks")
+        print(f"Pv2 Scanned networks: {len(ssids)}")
         return ssids
     except Exception as e:
         print(f"Pv2 Error scanning networks: {e}")
@@ -26,6 +26,7 @@ def connect_wifi():
     
     # when user click on connect with ssid and password
     if request.method == 'POST':
+        print(f"Host tried to connect")
         selected_ssid = request.form['ssid']
         wifi_password = request.form['password']
         
