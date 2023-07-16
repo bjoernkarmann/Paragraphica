@@ -20,8 +20,8 @@ def check_wifi():
 
 @app.route('/', methods=['GET', 'POST'])
 def connect_wifi():
-    error = None
-    success = None
+    error = ' '
+    success = ' '
     ssids = get_ssids()
     
     # when user click on connect with ssid and password
@@ -70,9 +70,10 @@ network={{
         return True  # ping was successful, we have a connection
     else:
         return False  # ping failed, no connection
+    
 def launch_program():
     subprocess.run(['python3', './main.py']) 
-    os._exit(0)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

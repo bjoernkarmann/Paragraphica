@@ -162,13 +162,19 @@ git reset --hard origin/main
 
 ## **🚨 Prepare Project Requirements**
 
-Install pip3
+Enable SPI interface: 
 ```
-sudo apt-get install python3-pip
+sudo raspi-config
 ```
-install flask through pip3
+Then, navigate to "Interface Options" > "SPI" and select "Yes" to enable SPI.
+
+Install pip3 and gps modules
 ```
-pip3 install flask
+sudo apt-get install python3-pip gpsd gpsd-clients python-gps
+```
+install the rest through pip3
+```
+sudo pip3 install flask gpiozero spidev requests luma.lcd pillow
 ```
 
 Now we can try run the wifi-connect.py to check if the captive portal appears when connecting to the network "Paragraphica Connect":
@@ -180,17 +186,32 @@ python3 wifi-connect.py
 
 Untested!
 
-Open the /etc/rc.local file in a text editor. You can use nano:
+Create a new service file:
 ```
-sudo nano /etc/rc.local
-```
-Add the following line before exit 0 in the file:
-```
-python3 /home/pi/Paragraphica-v2/wifi-connect.py &
+sudo nano /etc/systemd/system/wifi-connect.service
 ```
 
-Make your script executable by running:
+And enter the following:
 ```
-sudo chmod +x /home/pi/Paragraphica-v2/wifi-connect.py
+[Unit]
+Description=WiFi Connect Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/Paragraphica-v2/wifi-connect.py
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
+```
+Then, enable and start the service:
+```
+sudo systemctl enable wifi-connect
+sudo systemctl start wifi-connect
 ```
 
+You can check its status with
+```
+sudo systemctl status wifi-connect
+```
