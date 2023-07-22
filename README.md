@@ -72,7 +72,7 @@ Add the following lines to this file:
 ```
 interface=ap0
 driver=nl80211
-ssid=Paragraphica Connect
+ssid=paragraphica
 hw_mode=g
 channel=7
 wmm_enabled=0
@@ -149,7 +149,6 @@ sudo apt install git
 Clone the Paragraphica-v2 repository to the root
 
 ```
-cd
 git clone https://github.com/bjoernkarmann/Paragraphica-v2.git
 ```
 
@@ -159,7 +158,7 @@ cd Paragraphica-v2
 git fetch origin
 git reset --hard origin/main
 ```
-
+---
 ## **🚨 Prepare Project Requirements**
 
 Enable SPI interface: 
@@ -170,16 +169,16 @@ Then, navigate to "Interface Options" > "SPI" and select "Yes" to enable SPI.
 
 Install pip3 and gps modules
 ```
-sudo apt-get install python3-pip gpsd gpsd-clients python-gps
+sudo apt-get install python3-pip gpsd gpsd-clients
 ```
 install the rest through pip3
 ```
-sudo pip3 install flask gpiozero spidev requests luma.lcd pillow
+sudo pip3 install flask gpiozero spidev requests luma.lcd pillow gpsd-py3
 ```
 
 Now we can try run the wifi-connect.py to check if the captive portal appears when connecting to the network "Paragraphica Connect":
 ```
-python3 wifi-connect.py
+sudo python3 wifi-connect.py
 ```
 ---
 ## **🥾 Setup Boot Script**

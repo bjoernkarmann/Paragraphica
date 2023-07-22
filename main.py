@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 from luma.core.interface.serial import spi
 from luma.lcd.device import pcd8544
 from luma.core.render import canvas
+import os
 
 # Set up SPI for dials
 spiDials = spidev.SpiDev()
@@ -22,7 +23,6 @@ button1 = Button(2)
 button2 = Button(3)
 button3 = Button(4)
 button4 = Button(17)
-button5 = Button(27)
 
 # Set up GPS
 gpsd = gps(mode=WATCH_ENABLE)
@@ -36,7 +36,7 @@ def read_channel(channel):
 def map_range(value, in_min, in_max, out_min, out_max):
     return int((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
-options1 = ["one", "two", "tree", "four"]
+options1 = ["0.1", "0.2", "0.3", "0.4"]
 options2 = ["Painting", "Photo", "Watercolor", "Illustration"]
 options3 = ["1900", "1950", "1960", "1970"]
 
@@ -47,36 +47,78 @@ while True:
     pot3 = read_channel(2)
 
     # Map potentiometer values to array indexes and select options
-    opt1 = options1[map_range(pot1, 0, 1023, 0, len(options1)-1)]
-    opt2 = options2[map_range(pot2, 0, 1023, 0, len(options2)-1)]
-    opt3 = options3[map_range(pot3, 0, 1023, 0, len(options3)-1)]
+    dial1 = options1[map_range(pot1, 0, 1023, 0, len(options1)-1)]
+    dial2 = options2[map_range(pot2, 0, 1023, 0, len(options2)-1)]
+    dial3 = options3[map_range(pot3, 0, 1023, 0, len(options3)-1)]
 
-    print("Selected options:", opt1, opt2, opt3)
+    print("Selected options:", dial1, dial2, dial3)
 
     # Display selected options
     with canvas(device) as draw:
-        draw.text((0, 0), f"Options: {opt1}, {opt2}, {opt3}", fill="white")
-        
+        draw.text((0, 0), f"Options: {dial1}, {dial2}, {dial3}", fill="white")
+
     # Check buttons
     if button1.is_pressed:
-        print("Button 1 pressed")
+        print("Button 1 - Left") # this button will navigate to the left 
     if button2.is_pressed:
-        print("Button 2 pressed")
+        print("Button 2 - Right") # this button will navigate to the right
     if button3.is_pressed:
-        print("Button 3 pressed")
+        print("Button 3 - Mode") # this button will change modes 
     if button4.is_pressed:
-        print("Button 4 pressed")
-
-    if button5.is_pressed:
-        print("Button 5 pressed")
+        print("Button 4 - Trigger") # this button will start the image process
         
         # Read GPS data
         gpsd.next()
-        print("GPS data:", gpsd.fix.latitude, gpsd.fix.longitude)
 
-        # Make a GET request
-        response = requests.get('http://example.com')
-        print("Response from server:", response.text)
+        # URL for the API
+        url = "http://92.242.187.242:5000/api"
+
+        # Settings to send
+        data = {
+            "location": {"lat": gpsd.fix.latitude, "lon": gpsd.fix.longitude}, 
+            "image_strength": dial1,
+            "style": dial2, 
+            "year": dial3
+        }
+        
+        # Store the Paragraphica API key in the headers
+        headers = {
+            "X-API-KEY": "PLACE API KEY HERE"
+        }
+
+        # Send the POST request
+        response = requests.post(url, json=data, headers=headers)
+
+        # Check if request was successful
+        if response.status_code == 200:
+            print("Request successful")
+
+            # Get the image file path from the response
+            image_file_path = response.json().get('stability_image')
+            description = response.json().get('description')
+            status_report = response.json().get('status_report')
+
+            # Download the image file
+            with requests.get(image_file_path, stream=True) as r:
+                r.raise_for_status()
+                with open(os.path.join('images', os.path.basename(image_file_path)), 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+
+            # Save the image to a static folder
+            print(f"Image saved as {os.path.basename(image_file_path)}")
+            print(f"Description = {description}")
+            print(f"Status = {status_report}")
+
+            # Send request to delete the image from the server
+            delete_response = requests.delete(image_file_path, headers=headers)
+            if delete_response.status_code == 200:
+                print("Image deleted from the server")
+            else:
+                print("Failed to delete image from the server")
+
+        else:
+            print(f"Request failed with status code {response.status_code}")
 
 
     sleep(1)
