@@ -1,3 +1,18 @@
+## **Test Script Explanation**
+
+The test-api.py script located in the api folder, is a simple python script that connects to custom Paragraphica API server. Use this script through a terminal to test conenctivity and to see if images are stored. The test script needs a API key, that is shared separatly for security reasons. 
+
+Run the test in your terminal with using python3
+```
+python3 test-api.py
+```
+
+Settings in the test file inlcude:
+- Loacation = lat and lon
+- style = default photograph
+- image strength = how close to reality 
+- year = what year the image should depict
+
 ## **📡 Initial RPI setup**
 
 set up SD card with **Raspberry Pi Imager** and make sure it is able to connect to the internet fot the initial setup. Then ssh into the device:
@@ -176,9 +191,20 @@ install the rest through pip3
 sudo pip3 install flask gpiozero spidev requests luma.lcd pillow gpsd-py3
 ```
 
-Now we can try run the wifi-connect.py to check if the captive portal appears when connecting to the network "Paragraphica Connect":
+Set up a .env file to store the API key:
 ```
-sudo python3 wifi-connect.py
+touch .env
+nano .env
+```
+Now paste the API key into the file (note that this key is only provided by auther and is higly sensitive information):
+```
+API_KEY=PARAGRAPHICA-API-KEY-HERE
+```
+Save and exit. 
+
+Now we can try run the main.py to check if the captive portal appears when connecting to the network "Paragraphica Connect":
+```
+sudo python3 main.py
 ```
 ---
 ## **🥾 Setup Boot Script**
@@ -187,17 +213,17 @@ Untested!
 
 Create a new service file:
 ```
-sudo nano /etc/systemd/system/wifi-connect.service
+sudo nano /etc/systemd/system/main.service
 ```
 
 And enter the following:
 ```
 [Unit]
-Description=WiFi Connect Service
+Description=Pargraphica main script
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/Paragraphica-v2/wifi-connect.py
+ExecStart=/usr/bin/python3 /home/pi/Paragraphica-v2/main.py
 Restart=always
 Environment=PYTHONUNBUFFERED=1
 
@@ -206,11 +232,11 @@ WantedBy=multi-user.target
 ```
 Then, enable and start the service:
 ```
-sudo systemctl enable wifi-connect
-sudo systemctl start wifi-connect
+sudo systemctl enable main
+sudo systemctl start main
 ```
 
 You can check its status with
 ```
-sudo systemctl status wifi-connect
+sudo systemctl status main
 ```

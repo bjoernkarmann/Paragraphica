@@ -15,7 +15,7 @@ data = {
 
 # Store the Paragraphica API key in the headers
 headers = {
-    "X-API-KEY": "PLACE API KEY HERE"
+    "X-API-KEY": PLACE API KEY HERE
 }
 
 # Send the POST request

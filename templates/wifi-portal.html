@@ -20,6 +20,7 @@
             margin: 0 auto;
             width: 300px;
             padding: 1em;
+            text-align: center;
         }
         select, input[type="text"], input[type="password"] {
             width: 100%;
@@ -53,7 +54,8 @@
 
     </style>
     <form id="wifiForm" method="POST">
-        <p>Connect Paragraphica to wifi or phone hotspot. Selecting a network and enter the password.</p>
+        <img width="50px" src="/static/images/step3.png">
+        <p>Enter your hotspot- <br>or wifi details</p>
         <br>
         <p style="color: #c31919;">{{error}}</p>
         <p style="color: #19c38d;">{{success}}</p>
@@ -69,7 +71,7 @@
         <input type="submit" value="CONNECT"><br><br>
         <input type="button" value="Scan network again" onclick="location.reload()">
         <br><br>
-        <p class="gray" >Paragraphica needs a internet conenction to gather location data for the image generation process. Passwords are securely stored on the device. </p>
+        <p class="gray" >Paragraphica needs an internet connection to gather location data for the image generation process. Hotspot- or wifi details are securely stored on the device. </p>
         <a class="gray" href="">Documentation</a>
         <a class="gray" href="">Privacy Policy</a>
     </form>
